@@ -1,5 +1,5 @@
 TMP_DIR = tmp
-LIB_DIR = tmp
+LIB_DIR = priv
 
 DOVECOT_MAJOR_VSN = 2.2
 DOVECOT_MINOR_VSN = 16
@@ -17,7 +17,7 @@ DOVECOT_PREFIX    = $(LIB_DIR)/dovecot
 all: $(DOVECOT_PREFIX)
 
 clean:
-	rm -r $(LIB_DIR) $(TMP_DIR)
+	rm -r $(DOVECOT_PREFIX) $(TMP_DIR)
 
 $(LIB_DIR):
 	mkdir -p $@
@@ -26,10 +26,10 @@ $(TMP_DIR):
 	mkdir -p $@
 
 $(TMP_DIR)/$(DOVECOT_TAR_NAME).sig: $(TMP_DIR)
-	curl "$(DOVECOT_VSN_RELS)/$(notdir $@)" > $@
+	curl "$(DOVECOT_VSN_RELS)/$(notdir $@)" -o $@
 
 $(TMP_DIR)/$(DOVECOT_TAR_NAME): $(TMP_DIR)/$(DOVECOT_TAR_NAME).sig
-	curl "$(DOVECOT_VSN_RELS)/$(notdir $@)" > $@
+	curl "$(DOVECOT_VSN_RELS)/$(notdir $@)" -o $@
 	echo "WARNING: $@ not verified"
 
 $(TMP_DIR)/$(DOVECOT_NAME): $(TMP_DIR)/$(DOVECOT_TAR_NAME)

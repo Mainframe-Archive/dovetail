@@ -4,7 +4,7 @@ Dovetail *ahem* dovetails with dovecot and IMAP client testing.
 
 Dovetail's is an Elixir API that lets you:
 
-- start and stop a dovecot server
+- TODO start and stop a dovecot server
 - create and remove dovecot users
 - send an email to a particular dovecot user
   ... and verify its arrival? prob.
@@ -22,7 +22,8 @@ run:
 $ make
 ```
 
-and then let yourself get distracted. That's going to take awhile.
+and then let yourself get distracted. It's going to take awhile for it to
+download and compile dovecot.
 
 ### Dovetail
 
