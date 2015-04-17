@@ -2,15 +2,16 @@ defmodule TestHelper do
 
   alias Dovetail.User
 
-  @var "var"
+  @dir Application.app_dir(:dovetail, "test")
 
+  # Public Functions
 
   @doc """
   Returns the path to the testing data directory.
   """
   @spec join_path(List.t | String.t) :: String.t
-  def join_path(path) when is_binary(path), do: Path.join(@var, path)
-  def join_path(path) when is_list(path),   do: Path.join([@var | path])
+  def join_path(path) when is_binary(path), do: Path.join(@dir, path)
+  def join_path(path) when is_list(path),   do: Path.join([@dir | path])
 
 
   @doc """

@@ -1,20 +1,44 @@
-defmodule Dovetail.Config do
+defmodule Mix.Tasks.Dovetail.Config do
   @moduledoc """
   The `Dovetail.Config` module provides functions for templating in a
   `dovetail.conf` file.
 
-  ## Example
+  ## Usage
 
+      $ mix dovetail.config --default-user jtmoulia
   """
   require EEx
 
-  # Setup Templating
-
+  # Module Attributes
   @dovetail_conf_template Application.app_dir(
     :dovetail, "priv/dovecot.conf.eex")
 
+  # Setup Templating
+
+
   EEx.function_from_file :defp, :template_helper,
                          @dovetail_conf_template, [:assigns]
+
+  # Mix Callbacks
+
+  def run(args) do
+    case OptionParser.parse(args) do
+      {options, _, []} ->
+        conf_path = Dict.get(options, :conf_path, dovecot_conf_target())
+        template_options = options
+        |> Dict.take([:default_user, :log_path, :passdb_path])
+        |> template()
+        |> write!(conf_path)
+        Mix.Shell.IO.info(
+          "Templated #{conf_path} with #{inspect(template_options)}")
+      {_, argv, _} ->
+        # TODO - exit with error status
+        Mix.Shell.IO.error("unexpected argv: #{inspect argv}")
+      {_, _, error} ->
+        # TODO - exit with error status
+        Mix.Shell.IO.error("bad args: #{inspect error}")
+    end
+  end
 
   # Public Functions
 

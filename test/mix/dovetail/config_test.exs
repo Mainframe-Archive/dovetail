@@ -1,6 +1,6 @@
 defmodule Dovetail.ConfigTest do
   use ExUnit.Case
-  alias Dovetail.Config
+  alias Mix.Tasks.Dovetail.Config
 
   test "template/{0,1}" do
     {template, options} = Config.template()
@@ -25,7 +25,6 @@ defmodule Dovetail.ConfigTest do
     assert File.read!(path) == template
 
     File.rm!(path)
-    File.rmdir!(test_dir)
   end
 
 end

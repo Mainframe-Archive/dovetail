@@ -103,6 +103,8 @@ defmodule Dovetail.UserStore.PasswordFile do
 
   @spec write(t, [User.t]) :: :ok | {:error, term}
   defp write(store, users) do
+    # Create the path to the store if necessary
+    Path.dirname(store.path) |> File.mkdir_p()
     # Write users to store, replacing the existing file.
     case encode(users) do
       {:ok, string} ->
