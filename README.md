@@ -2,12 +2,12 @@
 
 Dovetail *ahem* dovetails with dovecot and IMAP client testing.
 
-Dovetail's is an Elixir API that lets you:
+Dovetail is an Elixir library that lets you:
 
-- TODO start and stop a dovecot server
-- create and remove dovecot users
-- send an email to a particular dovecot user
-  ... and verify its arrival? prob.
+- install a rootless dovecot server for testing
+- start and stop a dovecot server (`Dovetail.Process`)
+- create and remove dovecot users (`Dovetail.UserStore`)
+- TODO send an email to a particular dovecot user
 - all possible via a remote node
 
 ## Usage
@@ -38,7 +38,7 @@ Dovecot must also be configured to correctly use that resource. See
 ### More
 
 You can read more usage notes in the source code documentation for the various
-dovetail components. Start with
+dovetail components. Start with:
 
 ```elixir
 iex> h Dovetail
