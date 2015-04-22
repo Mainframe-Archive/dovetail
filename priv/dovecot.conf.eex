@@ -48,6 +48,8 @@ passdb {
   driver = passwd-file
   args = <%= @passdb_path %>
 }
+
 userdb {
-  driver = passwd
+  driver = passwd-file
+  args = <%= @passdb_path %>
 }

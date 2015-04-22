@@ -10,7 +10,7 @@ defmodule Dovetail.UserStore.PasswordFile do
 
   defstruct [:path]
 
-  @line_re ~r/^(?<username>.*):{(?<passtype>.*)}(?<password>.*)$/
+  @line_re ~r/^(?<username>.*):{(?<passtype>.*)}(?<password>.*):(?<uid>.*):(?<gid>.*):(?<home>.*):(?<extra_fields>.*)$/
 
   # Type Specs
 
@@ -88,8 +88,12 @@ defmodule Dovetail.UserStore.PasswordFile do
     case Regex.named_captures(@line_re, string) do
       %{"username" => username,
         "password" => password,
-        "passtype" => passtype} ->
-        User.new(username, {String.to_existing_atom(passtype), password})
+        "passtype" => passtype,
+        "uid"      => uid,
+        "gid"      => gid,
+        "home"     => home} ->
+        User.new(username, {String.to_existing_atom(passtype), password},
+                 uid: uid, gid: gid, home: home)
       _ -> {:error, :bad_string}
     end
   end
@@ -97,8 +101,11 @@ defmodule Dovetail.UserStore.PasswordFile do
   @spec encode_user(User.t) :: String.t
   def encode_user(%User{username: username,
                         password: password,
-                        passtype: passtype}) do
-    "#{username}:{#{passtype}}#{password}\n"
+                        passtype: passtype,
+                        uid:      uid,
+                        gid:      gid,
+                        home:     home}) do
+    "#{username}:{#{passtype}}#{password}:#{uid}:#{gid}:#{home}:\n"
   end
 
   @spec write(t, [User.t]) :: :ok | {:error, term}

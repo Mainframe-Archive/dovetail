@@ -1,23 +1,9 @@
 defmodule Dovetail.Process do
   @moduledoc """
-  The `Dovetail.Dovecot` module provides functions for managing
-  the dovecot process.
+  The `Dovetail.Dovecot` module provides functions for calling
+  dovecot binaries.
 
-  This module requires Dovetail's rootless Dovecot install. See
-  `Dovecot`.
-
-  ## Examples
-
-      iex> Process.up?
-      false
-      iex> Process.start()
-      :ok
-      iex> Process.up?
-      true
-      iex> Process.stop()
-      :ok
-      iex> Process.up?
-      false
+  See `dovecot/2` and `dove_adm/2`.
   """
 
   # Module Attributes
@@ -30,42 +16,6 @@ defmodule Dovetail.Process do
   @type doveadm_opts :: [doveadm: String.t]
 
   # Public Functions
-
-  @doc """
-  Check if dovecot is up.
-  """
-  def up?(options \\ []) do
-    case pgrep(["-f", Keyword.get(options, :path, @dovecot)]) do
-      {:ok, _}    -> true
-      {:error, _} -> false
-    end
-  end
-
-  @doc """
-  Start the dovecot server with the default settings.
-
-  See `dovecot/0`.
-  """
-  def start do
-    case dovecot() do
-      {:ok, ""}               -> :ok
-      {:error, {:status, 89}} -> {:error, :already_started}
-      {:error, reason}        -> {:error, reason}
-    end
-  end
-
-  @doc """
-  Start the dovecot server with the default settings.
-
-  See `doveadm(["stop"])`
-  """
-  def stop do
-    case doveadm(["stop"]) do
-      {:ok, ""}               -> :ok
-      {:error, {:status, 75}} -> {:error, :already_stopped}
-      {:error, reason}        -> {:error, reason}
-    end
-  end
 
   @doc """
   Call the dovecot executable with options.
@@ -84,9 +34,20 @@ defmodule Dovetail.Process do
     * `path` the doveadm name or path. Defaults to #{inspect(@doveadm)}.
   """
   @spec doveadm([String.t], doveadm_opts) ::
-    {:ok, String.t} | {:error, :bad_args | :unknown}
+    {:ok, String.t} | {:error, any}
   def doveadm(args, opts \\ []) do
     Keyword.get(opts, :path, @doveadm) |> cmd(args)
+  end
+
+  @doc """
+  Call pgrep with args, and parse result.
+  """
+  @spec pgrep([String.t]) :: {:ok, } | {:error, any}
+  def pgrep(args) do
+    case System.cmd("pgrep", args, [stderr_to_stdout: true]) do
+      {result, 0} -> {:ok, String.strip(result) |> String.to_integer()}
+      {_, status} -> {:error, {:status, status}}
+    end
   end
 
   # Private Functions
@@ -101,11 +62,4 @@ defmodule Dovetail.Process do
     end
   end
 
-
-  defp pgrep(args) do
-    case System.cmd("pgrep", args, [stderr_to_stdout: true]) do
-      {result, 0} -> {:ok, String.strip(result) |> String.to_integer()}
-      {_, status} -> {:error, {:status, status}}
-    end
-  end
 end

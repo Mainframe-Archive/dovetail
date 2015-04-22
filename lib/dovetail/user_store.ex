@@ -1,6 +1,6 @@
 defprotocol Dovetail.UserStore do
   @moduledoc """
-  The `Dovetial.UserStore` module defines the users store protocol.
+  The `Dovetail.UserStore` module defines the users store protocol.
   """
   alias Dovetail.User
 

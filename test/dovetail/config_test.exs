@@ -1,6 +1,6 @@
 defmodule Dovetail.ConfigTest do
   use ExUnit.Case
-  alias Mix.Tasks.Dovetail.Config
+  alias Dovetail.Config
 
   test "template/{0,1}" do
     {template, options} = Config.template()

@@ -23,12 +23,13 @@ defmodule TestHelper do
 
   @doc """
   Create a random string of the provided length, from the list of chars
-  provided.
+  provided. The default range of characters are lowercase alphabetic
+  characters.
 
   NB: for a new sequence of random strings, `random_seed/0` must be called
   first
   """
-  @default_range Enum.to_list(65..90) ++ Enum.to_list(97..122)
+  @default_range Enum.to_list(97..122) # Enum.to_list(65..90)
   def rand(length \\ 10, range \\ @default_range, acc \\ [])
   def rand(0, _, acc) do
     :erlang.list_to_binary(acc)
@@ -40,4 +41,6 @@ defmodule TestHelper do
 
 end
 
+Dovetail.write_config()
+ExUnit.configure(exclude: [pending: true])
 ExUnit.start()
