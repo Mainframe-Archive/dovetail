@@ -45,6 +45,6 @@ iex> h Dovetail
 
 ## License + Copyright
 
-TODO: License?
+Dovetail may be redistributed according to the BSD 3-Clause License.
 
-Copyright (c) ThusFresh, Inc., 2015
+Copyright (c) 2015, ThusFresh Inc
