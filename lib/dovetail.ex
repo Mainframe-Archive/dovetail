@@ -4,6 +4,9 @@ defmodule Dovetail do
 
   ## Install
 
+      iex> Dovetail.write_config()
+      {:ok, _}
+
   ## Examples
 
       iex> Dovetail.up?
@@ -58,10 +61,6 @@ defmodule Dovetail do
    * `:config :: String.t` the path to the config file
   """
   def start(options \\ []) do
-    args = case options[:config] do
-             nil    -> []
-             config -> ["-c", config]
-           end
     case Process.dovecot(["-c", Dict.get(options, :config,
                                          Config.target_path())]) do
       {:ok, ""}               -> :ok
@@ -80,6 +79,33 @@ defmodule Dovetail do
       {:ok, ""}               -> :ok
       {:error, {:status, 75}} -> {:error, :already_stopped}
       {:error, reason}        -> {:error, reason}
+    end
+  end
+
+  @doc """
+  """
+  @spec reload :: :ok | {:error, any}
+  def reload do
+    case Process.doveadm(["reload"]) do
+      {:ok, ""}         -> :ok
+      {:error, _} = err -> err
+    end
+  end
+
+  @doc """
+  Create the dovecot server's configuration, reloading it if dovecot is
+  running.
+  """
+  @spec config(Keyword.t) :: {:ok, Keyword.t} | {:error, any}
+  def config(opts \\ []) do
+    vars = Config.write!(Config.template(opts))
+    if up? do
+      case reload() do
+        :ok -> {:ok, vars}
+        any -> any
+      end
+    else
+      {:ok, vars}
     end
   end
 

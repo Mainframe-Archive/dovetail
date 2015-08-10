@@ -1,6 +1,11 @@
 defmodule Dovetail.User do
   @moduledoc """
   The `Dovetail.User` module provides a user struct.
+
+  ## Example
+
+      iex> Dovetail.User.new("john@doe.com")
+      %Dovetail.User{username: "john@doe.com", passtype: :plain, password: "password", uid: nil, gid: nil, home: nil}
   """
 
   defstruct [:username, :passtype, :password, :uid, :gid, :home]

@@ -3,7 +3,7 @@ defmodule Dovetail.Config do
   The `Dovetail.Config` module provides functions for templating in a
   `dovetail.conf` file.
 
-  ## Usage
+  ## Mix Usage
 
       $ mix dovetail.config --default-user jtmoulia
   """
@@ -47,13 +47,20 @@ defmodule Dovetail.Config do
   end
 
   @doc """
-  Returns the target path for the dovecot configuration.
+  Return the target path for the dovecot configuration.
   """
   @spec target_path :: String.t
   def target_path do
     Application.app_dir(:dovetail,  "dovecot.conf")
   end
 
+  @doc """
+  Return the path to dovecot.
+  """
+  @spec dovecot_path :: String.t
+  def dovecot_path do
+    Application.app_dir(:dovetail, Path.join("priv", "dovecot"))
+  end
 
   # Private Functions
 
@@ -66,9 +73,18 @@ defmodule Dovetail.Config do
 
   @spec defaults :: Keyword.t
   defp defaults do
-    %{default_user: whoami!(),
-      log_path:     log_path(),
-      passdb_path:  passdb_path()}
+    %{default_user:       whoami!(),
+      mail_location_path: mail_location_path(),
+      log_path:           log_path(),
+      passdb_path:        passdb_path(),
+      userdb_socket:      userdb_socket(),
+      master_socket:      master_socket()
+     }
+  end
+
+  @spec mail_location_path :: String.t
+  defp mail_location_path do
+    Path.join(Application.app_dir(:dovetail), "Maildir")
   end
 
   @spec passdb_path :: String.t
@@ -78,14 +94,24 @@ defmodule Dovetail.Config do
 
   @spec log_path :: String.t
   defp log_path do
-    Path.join(Application.app_dir(:dovetail), "log")
+    Path.join(Application.app_dir(:dovetail), "dovecot.log")
+  end
+
+  @spec userdb_socket :: String.t
+  def userdb_socket do
+    Path.join(Application.app_dir(:dovetail), "auth-userdb")
+  end
+
+  @spec master_socket :: String.t
+  def master_socket do
+    Path.join(Application.app_dir(:dovetail), "auth-master")
   end
 
   @spec whoami! :: String.t
   defp whoami! do
     case System.cmd("whoami", []) do
       {username, 0} -> String.strip(username)
-      {_, code}     -> raise ArgumentError, message: "bad whoami call"
+      {_, code}     -> raise ArgumentError, message: "bad whoami: #{code}"
     end
   end
 
