@@ -7,7 +7,6 @@ defmodule DovetailTest do
     on_exit &stop_if_up/0
   end
 
-  @tag pending: true
   test "up?/{0,1} and start/stop" do
     assert not Dovetail.up?
 

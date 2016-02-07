@@ -15,7 +15,6 @@ defmodule Dovetail.Config do
 
   # Setup Templating
 
-
   EEx.function_from_file :defp, :template_helper,
                          @dovetail_conf_template, [:assigns]
 
@@ -24,7 +23,7 @@ defmodule Dovetail.Config do
   @doc """
   Template out the config file.
 
-  TODO: allow the dovecot root to be set with an
+  TODO: allow the dovecot root to be set with an option.
   """
   @spec template(Keyword.t) :: {String.t, Keyword.t}
   def template(options \\ []) when is_list(options) do
@@ -33,7 +32,6 @@ defmodule Dovetail.Config do
   end
 
   @doc """
-
   Write the result of `template/1` to `path`, creating the path's directory
   prefix if it doesn't exist.
 
