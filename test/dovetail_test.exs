@@ -1,7 +1,6 @@
 defmodule DovetailTest do
   use ExUnit.Case, async: false
-
-  # doctest Dovetail
+  doctest Dovetail
 
   setup do
     stop_if_up()

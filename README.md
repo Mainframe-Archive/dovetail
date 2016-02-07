@@ -1,14 +1,16 @@
 # Dovetail
 
-Dovetail *ahem* dovetails with dovecot and IMAP client testing.
+Dovetail *ahem* dovetails Elixir and dovecot. It's raison d'être is to control a
+dovecot server for IMAP testing.
 
 Dovetail is an Elixir library that lets you:
 
 - install a rootless dovecot server for testing
+- an Elixir API to interact with the dovecot server (`Dovetail`)
 - start and stop a dovecot server (`Dovetail.Process`)
 - create and remove dovecot users (`Dovetail.UserStore`)
-- TODO send an email to a particular dovecot user
-- all possible via a remote node
+- send an email to a particular dovecot user (`Dovetail.Deliver`)
+- all possible via a remote node, because Erlang
 
 ## Usage
 
@@ -25,9 +27,28 @@ $ make
 and then let yourself get distracted. It's going to take awhile for it to
 download and compile dovecot.
 
+#### Configuration
+
+Dovecot's `dovecot.conf` must be generated before starting the mail server. There
+are two ways to call the necessary `Dovecot.Config` code.
+
+From within an Elixir VM:
+
+```elixir
+Dovetail.config()
+```
+
+Or, using the mix task:
+
+```shell
+mix dovetail.config
+```
+
+The `dovecot.conf` file is templated from `priv/dovecot.conf.eex`.
+
 ### Dovetail
 
-The dovetail application must have access to whatever `UserStore` resource it is
+The Dovetail library must have access to whatever `UserStore` resource it is
 trying to access. For example, if you're using a `UserStore.PasswordFile`, the
 node must be able to read and write to the file specified by path.
 
@@ -38,7 +59,7 @@ Dovecot must also be configured to correctly use that resource. See
 ### More
 
 You can read more usage notes in the source code documentation for the various
-dovetail components. Start with:
+Dovetail components. Start with:
 
 ```elixir
 iex> h Dovetail

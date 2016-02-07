@@ -41,6 +41,6 @@ defmodule TestHelper do
 
 end
 
-Dovetail.write_config()
+Dovetail.config()
 ExUnit.configure(exclude: [pending: true])
 ExUnit.start()

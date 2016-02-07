@@ -1,11 +1,15 @@
 defmodule Dovetail do
   @moduledoc """
-  The `Dovetail` module provides the public API for the application.
+  The `Dovetail` module provides the public API.
 
   ## Install
 
-      iex> Dovetail.write_config()
-      {:ok, _}
+  `Dovetail.config/0` must be run before first starting dovecot. Note that the
+  return is suppressed here because I don't want to explicitly match dovetails
+  return values.
+
+      iex> Dovetail.config(); :ok
+      :ok
 
   ## Examples
 
@@ -19,6 +23,7 @@ defmodule Dovetail do
       :ok
       iex> Dovetail.up?
       false
+
   """
 
   alias Dovetail.Process
@@ -28,18 +33,6 @@ defmodule Dovetail do
   # TODO - this should be defined elsewhere
   @dovecot Application.app_dir(:dovetail, "priv/dovecot/sbin/dovecot")
   @pass_db Application.app_dir(:dovetail, "pass.db")
-
-  @doc """
-  Write the dovecot config.
-  """
-  def write_config(options \\ []) do
-    conf_path = Dict.get(options, :target, Config.target_path())
-    template_options = options
-      |> Dict.take([:default_user, :log_path, :passdb_path])
-      |> Config.template()
-      |> Config.write!(conf_path)
-    {:ok, template_options}
-  end
 
   @doc """
   Check if dovecot is up.
@@ -83,6 +76,7 @@ defmodule Dovetail do
   end
 
   @doc """
+  Reload the configure by calling `doveadm reload`.
   """
   @spec reload :: :ok | {:error, any}
   def reload do
@@ -98,14 +92,18 @@ defmodule Dovetail do
   """
   @spec config(Keyword.t) :: {:ok, Keyword.t} | {:error, any}
   def config(opts \\ []) do
-    vars = Config.write!(Config.template(opts))
+    conf_path = Dict.get(opts, :target, Config.target_path())
+    template_opts = opts
+    |> Dict.take([:default_user, :log_path, :passdb_path])
+    |> Config.template()
+    |> Config.write!(conf_path)
     if up? do
       case reload() do
-        :ok -> {:ok, vars}
+        :ok -> {:ok, template_opts}
         any -> any
       end
     else
-      {:ok, vars}
+      {:ok, template_opts}
     end
   end
 
