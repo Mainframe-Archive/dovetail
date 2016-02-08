@@ -3,7 +3,7 @@ defmodule Dovetail.Mixfile do
 
   def project do
     [app: :dovetail,
-     version: "0.0.2",
+     version: "0.0.3",
      name: "Dovetail",
      description: description,
      source_url: "https://github.com/thusfresh/dovetail",
