@@ -6,7 +6,7 @@ dovecot server for IMAP testing.
 Dovetail is an Elixir library that lets you:
 
 - install a rootless dovecot server for testing
-- an Elixir API to interact with the dovecot server (`Dovetail`)
+- interact with a dovecot server via Elixir (`Dovetail`)
 - start and stop a dovecot server (`Dovetail.Process`)
 - create and remove dovecot users (`Dovetail.UserStore`)
 - send an email to a particular dovecot user (`Dovetail.Deliver`)
@@ -21,7 +21,7 @@ Dovetail requires dovecot. To setup a
 run:
 
 ```shell
-$ make
+$ mix dovetail.make
 ```
 
 and then let yourself get distracted. It's going to take awhile for it to
@@ -38,10 +38,12 @@ $ mix compile
 
 ### Configuration
 
-Dovecot's `dovecot.conf` must be generated before starting the mail server. There
-are two ways to call the necessary `Dovecot.Config` code.
+Dovecot's `dovecot.conf` must be generated before starting the mail server. This
+will be done implicitly if you start the `:dovetail` application or call
+`Dovetail.ensure/1`. 
 
-From within an Elixir VM:
+There are two ways to explicitly call the necessary `Dovecot.Config` code. From
+within an Elixir VM:
 
 ```elixir
 Dovetail.config()
@@ -59,7 +61,7 @@ The `dovecot.conf` file is templated from `priv/dovecot.conf.eex`.
 
 Dovetail can be used as a library, application, or mix command-line tool.
 
-### IEx
+### IEx Shell
 
 Start an IEx shell by calling:
 
