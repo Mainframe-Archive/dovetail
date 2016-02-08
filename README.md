@@ -12,7 +12,7 @@ Dovetail is an Elixir library that lets you:
 - send an email to a particular dovecot user (`Dovetail.Deliver`)
 - all possible via a remote node, because Erlang
 
-## Usage
+## Install
 
 ### Dovecot
 
@@ -27,7 +27,16 @@ $ make
 and then let yourself get distracted. It's going to take awhile for it to
 download and compile dovecot.
 
-#### Configuration
+### Dovetail
+
+Fetch Dovetail's dependencies and compile it all:
+
+```shell
+$ mix deps.get
+$ mix compile
+```
+
+### Configuration
 
 Dovecot's `dovecot.conf` must be generated before starting the mail server. There
 are two ways to call the necessary `Dovecot.Config` code.
@@ -46,11 +55,42 @@ mix dovetail.config
 
 The `dovecot.conf` file is templated from `priv/dovecot.conf.eex`.
 
-### Dovetail
+## Usage
 
-Dovetail can be used as a library, application, or command-line tool via mix.
+Dovetail can be used as a library, application, or mix command-line tool.
 
-#### User Store
+### IEx
+
+Start an IEx shell by calling:
+
+```shell
+$ iex -S mix
+```
+
+The `:dovetail` application, along with the dovecot server, should start with
+the mix application. You can check this with `Dovetail.up?/0`
+
+```elixir
+iex> Dovetail.up?
+true
+```
+
+### Documentation
+
+You can read more usage notes in the source code documentation for the various
+Dovetail components. Start with checking the documentation from the IEx shell:
+
+```elixir
+iex> h Dovetail
+```
+
+You can also build the documentation into neat and trim HTML:
+
+```shell
+$ mix docs
+```
+
+### User Store
 
 The Dovetail library must have access to whatever `UserStore` resource it is
 trying to access. For example, if you're using a `UserStore.PasswordFile`, the
@@ -59,15 +99,6 @@ node must be able to read and write to the file specified by path.
 Dovecot must also be configured to correctly use that resource. See
 
 - `Dovetail.UserStore.PasswordFile`
-
-### More
-
-You can read more usage notes in the source code documentation for the various
-Dovetail components. Start with:
-
-```elixir
-iex> h Dovetail
-```
 
 ## License + Copyright
 
