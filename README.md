@@ -46,13 +46,13 @@ There are two ways to explicitly call the necessary `Dovecot.Config` code. From
 within an Elixir VM:
 
 ```elixir
-Dovetail.config()
+iex> Dovetail.config()
 ```
 
 Or, using the mix task:
 
 ```shell
-mix dovetail.config
+$ mix dovetail.config
 ```
 
 The `dovecot.conf` file is templated from `priv/dovecot.conf.eex`.

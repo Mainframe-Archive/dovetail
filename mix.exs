@@ -10,7 +10,7 @@ defmodule Dovetail.Mixfile do
      elixir: "~> 1.2",
      deps: deps,
      package: package,
-     docs: [extras: ["README.md"]]]
+     docs: docs]
   end
 
   def application do
@@ -35,6 +35,11 @@ defmodule Dovetail.Mixfile do
   defp deps do
     [{:earmark, "~> 0.2", only: :dev},
      {:ex_doc, "~> 0.11", only: :dev}]
+  end
+
+  defp docs do
+    [main: "overview",
+     extras: ["README.md": [title: "Overview", path: "overview"]]]
   end
 
 end
