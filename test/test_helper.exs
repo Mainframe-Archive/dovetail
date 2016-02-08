@@ -41,5 +41,4 @@ defmodule TestHelper do
 
 end
 
-Dovetail.config()
 ExUnit.start()

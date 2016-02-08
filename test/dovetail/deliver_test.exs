@@ -5,14 +5,12 @@ defmodule Dovetail.DeliverTest do
   alias Dovetail.UserStore
 
   setup do
-    :ok = Dovetail.start()
     user = TestHelper.rand_user()
     {:ok, user_store} = Dovetail.get_user_store()
     {:ok, user_store} = Dovetail.UserStore.add(user_store, user)
 
     on_exit fn ->
       {:ok, _} = UserStore.remove(user_store, user.username)
-      :ok = Dovetail.stop()
     end
 
     {:ok, [user: user]}

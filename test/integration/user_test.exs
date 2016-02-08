@@ -7,11 +7,6 @@ defmodule Integration.UserTest do
   alias Dovetail.Config
 
   setup do
-    Dovetail.start()
-    :timer.sleep(3000)
-    on_exit fn ->
-      Dovetail.stop()
-    end
     {:ok, user_store} = Dovetail.get_user_store()
     {:ok, [user_store: user_store]}
   end

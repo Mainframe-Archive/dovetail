@@ -36,7 +36,7 @@ defmodule Dovetail.Deliver do
   # Date: Fri, 21 Nov 1997 09:55:06 -0600
   @email_template """
 From: <%= @from %>
-To: <%= @recipient %>
+To: <%= @to %>
 Subject: <%= @subject %>
 
 <%= @body %>

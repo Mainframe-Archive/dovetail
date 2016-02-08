@@ -48,6 +48,10 @@ The `dovecot.conf` file is templated from `priv/dovecot.conf.eex`.
 
 ### Dovetail
 
+Dovetail can be used as a library, application, or command-line tool via mix.
+
+#### User Store
+
 The Dovetail library must have access to whatever `UserStore` resource it is
 trying to access. For example, if you're using a `UserStore.PasswordFile`, the
 node must be able to read and write to the file specified by path.

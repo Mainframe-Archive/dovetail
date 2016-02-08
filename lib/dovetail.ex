@@ -1,12 +1,16 @@
 defmodule Dovetail do
   @moduledoc """
-  The `Dovetail` module provides the public API.
+  The `Dovetail` module provides the public API and OTP application
+  implementation.
+
+  When the application `:dovetail` is started, its supervision ensures that
+  dovecot is configured and running. The dovecot server is stopped with the
+  application.
 
   ## Install
 
-  `Dovetail.config/0` must be run before first starting dovecot. Note that the
-  return is suppressed here because I don't want to explicitly match dovetails
-  return values.
+  `Dovetail.config/0` must be run before first starting dovecot. The `:dovecot`
+  application ensures configuration, otherwise it must be done explicitly:
 
       iex> Dovetail.config(); :ok
       :ok
@@ -30,9 +34,30 @@ defmodule Dovetail do
   alias Dovetail.UserStore
   alias Dovetail.Config
 
+  require Logger
+
   # TODO - this should be defined elsewhere
   @dovecot Application.app_dir(:dovetail, "priv/dovecot/sbin/dovecot")
   @pass_db Application.app_dir(:dovetail, "pass.db")
+
+  # await defaults
+  @timeout 5000
+  @interval 50
+  @await_opts [timeout: @timeout, interval: @interval]
+
+  ## Application Callbacks
+
+  @doc """
+  Start the dovecot application.
+
+  Despite the naming conflict, this function is semantically distinct from `start/0`
+  and `start/1`.
+  """
+  def start(_type, _args) do
+    Dovetail.Supervisor.start_link()
+  end
+
+  ## Public Functions
 
   @doc """
   Check if dovecot is up.
@@ -45,20 +70,58 @@ defmodule Dovetail do
   end
 
   @doc """
-  Start the dovecot server with the default settings.
+  Start the dovecot server with the default settings. This function is
 
-  See `dovecot/0`.
 
   ## Options
 
    * `:config :: String.t` the path to the config file
+   * `:await` :: Keyword.t | false` default [], if a keyword,
+     use as `await/1`
   """
-  def start(options \\ []) do
-    case Process.dovecot(["-c", Dict.get(options, :config,
+  @spec start(Keyword.t) :: :ok | {:error, :already_started}
+  def start(opts \\ []) do
+    Logger.debug("Dovecot: starting...")
+    case Process.dovecot(["-c", Dict.get(opts, :config,
                                          Config.target_path())]) do
-      {:ok, ""}               -> :ok
+      {:ok, ""} ->
+        if await_opts = Dict.get(opts, :await, @await_opts) do
+          await(await_opts)
+        else
+          :ok
+        end
       {:error, {:status, 89}} -> {:error, :already_started}
       {:error, reason}        -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Await for the dovecot server to start.
+
+  ## Options
+
+   * `:timeout :: int` default #{inspect @timeout}, the amount of time in ms
+     to await dovecot
+   * `:interval :: interval` default #{inspect @interval}, the interval time
+     in ms between dovecot status polls
+  """
+  def await(opts \\ []) do
+    await(Dict.get(opts, :timeout, @timeout),
+          Dict.get(opts, :interval, 50),
+          0)
+  end
+
+  defp await(timeout, interval, count) when count * interval > timeout do
+    {:error, :timeout}
+  end
+  defp await(timeout, interval, count) do
+    if up? do
+      Logger.debug("Dovecot: up!")
+      :ok
+    else
+      receive do after interval ->
+          await(timeout, interval, count + 1)
+      end
     end
   end
 
@@ -68,10 +131,30 @@ defmodule Dovetail do
   See `doveadm(["stop"])`.
   """
   def stop do
+    Logger.debug("Dovecot: stopping...")
     case Process.doveadm(["stop"]) do
       {:ok, ""}               -> :ok
       {:error, {:status, 75}} -> {:error, :already_stopped}
       {:error, reason}        -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Ensure that the dovecot server is configured and running.
+
+  See `start/0`.
+  """
+  @spec ensure(Keyword.t) :: :ok | {:error, any}
+  def ensure(opts \\ []) do
+    if Dovetail.up? do
+      :ok
+    else
+      {:ok, template_opts} = Dovetail.config(opts)
+      case Dovetail.start() do
+        :ok -> :ok
+        {:error, :already_started} -> :ok
+        {:error, _} = err -> err
+      end
     end
   end
 
