@@ -1,8 +1,8 @@
 defmodule Dovetail.DeliverTest do
   use ExUnit.Case, async: false
 
-  alias Dovetail.Deliver
-  alias Dovetail.UserStore
+  alias Dovetail.{Deliver, UserStore}
+  alias Dovetail.Deliver.DateTimeOffset
 
   setup do
     user = TestHelper.rand_user()
@@ -20,8 +20,22 @@ defmodule Dovetail.DeliverTest do
     email = Deliver.new_email(to: "#{user.username}@example.com",
                               from: "john@doe.com",
                               subject: "subjective",
-                              body: "content")
-    assert :ok == Deliver.call(user, email)
+                              body: "content",
+                              date: DateTimeOffset.now())
+    assert :ok == Deliver.call(user.username, email)
+  end
+
+  test "DateTimeOffset.now/0" do
+    dto = DateTimeOffset.now()
+    {date, time} = dto.datetime
+    assert is_tuple(date)
+    assert is_tuple(time)
+    assert 0 == dto.offset
+  end
+
+  test "inspect(%DateTimeOffset{})" do
+    dto = DateTimeOffset.now()
+    assert is_binary(inspect(dto))
   end
 
 end

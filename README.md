@@ -46,7 +46,7 @@ There are two ways to explicitly call the necessary `Dovecot.Config` code. From
 within an Elixir VM:
 
 ```elixir
-iex> Dovetail.config()
+iex> Dovetail.set_config()
 ```
 
 Or, using the mix task:

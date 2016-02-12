@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Dovetail.Config do
   def run(args) do
     case OptionParser.parse(args) do
       {options, [], []} ->
-        {:ok, template_options} = Dovetail.config(options)
+        {:ok, template_options} = Dovetail.set_config(options)
         Mix.Shell.IO.info(
           "Templated dovecot.conf with #{inspect(template_options)}")
       {_, argv, []} ->

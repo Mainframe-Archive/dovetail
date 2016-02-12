@@ -6,6 +6,8 @@ defmodule Dovetail.Process do
   See `dovecot/2` and `dove_adm/2`.
   """
 
+  alias Dovetail.Config
+
   # Module Attributes
 
   @dovecot Application.app_dir(:dovetail, "priv/dovecot/sbin/dovecot")
@@ -20,9 +22,16 @@ defmodule Dovetail.Process do
   @doc """
   Call the dovecot executable with options.
 
-  * `path` the dovecot name or path. Defaults to #{inspect(@dovecot)}.
+   * `:path` the dovecot name or path. Defaults to #{inspect(@dovecot)}.
+   * `:config` the path to the dovecot config. This will be excluded if set
+     to nil. Defaults to `#{inspect(Config.conf_path())}`.
   """
   def dovecot(args \\ [], opts \\ []) do
+    args = case Dict.fetch(opts, :config) do
+             :error -> ["-c", Config.conf_path() | args]
+             {:ok, nil} -> args
+             {:ok, path} -> ["-c", path | args]
+           end
     Keyword.get(opts, :path, @dovecot) |> cmd(args)
   end
 
@@ -31,7 +40,7 @@ defmodule Dovetail.Process do
 
   ## Options
 
-    * `path` the doveadm name or path. Defaults to #{inspect(@doveadm)}.
+    * `:path` the doveadm name or path. Defaults to #{inspect(@doveadm)}.
   """
   @spec doveadm([String.t], doveadm_opts) ::
     {:ok, String.t} | {:error, any}

@@ -20,7 +20,9 @@ defmodule Integration.UserTest do
   end
 
   defp call_doveadm_user(arg) do
-    case Process.doveadm(["user", "-a", Config.master_socket, arg]) do
+    case Process.doveadm(["user",
+                          "-a", Path.join(Config.base_path, "auth-master"),
+                          arg]) do
       {:ok, raw_user}  -> {:ok, raw_user}
       {:error, 67}     -> {:error, :no_user}
       {:error, reason} -> {:error, reason}

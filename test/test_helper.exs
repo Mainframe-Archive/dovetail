@@ -41,4 +41,8 @@ defmodule TestHelper do
 
 end
 
+System.at_exit fn (_status) ->
+  Application.stop(:dovetail)
+end
+
 ExUnit.start()

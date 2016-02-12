@@ -38,18 +38,27 @@ defmodule Dovetail.Config do
   Returns `options`.
   """
   @spec write!({String.t, Keyword.t}, String.t) :: Keyword.t
-  def write!({template, options}, path \\ target_path()) do
+  def write!({template, options}, path \\ conf_path()) do
     Path.dirname(path) |> File.mkdir_p!()
     File.write!(path, template)
     options
   end
 
   @doc """
-  Return the target path for the dovecot configuration.
+  Return the path to the dovecot configuration file, `dovecot.conf`.
   """
-  @spec target_path :: String.t
-  def target_path do
+  @spec conf_path :: String.t
+  def conf_path do
     Application.app_dir(:dovetail,  "dovecot.conf")
+  end
+
+  @doc """
+  Return the path to the dovecot base run directory. State files will be
+  kept relative to this directory.
+  """
+  @spec base_path :: String.t
+  def base_path do
+    Application.app_dir(:dovetail, Path.join("var", "dovecot"))
   end
 
   @doc """
@@ -58,6 +67,16 @@ defmodule Dovetail.Config do
   @spec dovecot_path :: String.t
   def dovecot_path do
     Application.app_dir(:dovetail, Path.join("priv", "dovecot"))
+  end
+
+  @doc """
+  Return the path to the passdb.
+
+  Currently only intended for passdb-file.
+  """
+  @spec passdb_path :: String.t
+  def passdb_path do
+    Path.join([Application.app_dir(:dovetail), "var", "pass.db"])
   end
 
   # Private Functions
@@ -71,38 +90,23 @@ defmodule Dovetail.Config do
 
   @spec defaults :: Keyword.t
   defp defaults do
+    # NB: this has the side effect of creating the necessary directories
     %{default_user:       whoami!(),
-      mail_location_path: mail_location_path(),
-      log_path:           log_path(),
-      passdb_path:        passdb_path(),
-      userdb_socket:      userdb_socket(),
-      master_socket:      master_socket()
+      mail_location_path: mail_location_path() |> ensure_path(),
+      log_path:           log_path() |> ensure_path(),
+      passdb_path:        passdb_path() |> ensure_path(),
+      base_path:          base_path() |> ensure_path()
      }
   end
 
   @spec mail_location_path :: String.t
   defp mail_location_path do
-    Path.join(Application.app_dir(:dovetail), "Maildir")
-  end
-
-  @spec passdb_path :: String.t
-  defp passdb_path do
-    Path.join(Application.app_dir(:dovetail), "pass.db")
+    Path.join([Application.app_dir(:dovetail), "var", "Maildir"])
   end
 
   @spec log_path :: String.t
   defp log_path do
-    Path.join(Application.app_dir(:dovetail), "dovecot.log")
-  end
-
-  @spec userdb_socket :: String.t
-  def userdb_socket do
-    Path.join(Application.app_dir(:dovetail), "auth-userdb")
-  end
-
-  @spec master_socket :: String.t
-  def master_socket do
-    Path.join(Application.app_dir(:dovetail), "auth-master")
+    Path.join([Application.app_dir(:dovetail), "var", "dovecot.log"])
   end
 
   @spec whoami! :: String.t
@@ -111,6 +115,11 @@ defmodule Dovetail.Config do
       {username, 0} -> String.strip(username)
       {_, code}     -> raise ArgumentError, message: "bad whoami: #{code}"
     end
+  end
+
+  defp ensure_path(path) do
+    :ok = Path.dirname(path) |> File.mkdir_p!()
+    path
   end
 
 end
