@@ -179,7 +179,8 @@ defmodule Dovetail do
     email_opts = [from: @from_default,
                   subject: @subject_default,
                   body: @body_default,
-                  date: Deliver.DateTimeOffset.now()]
+                  date: Deliver.DateTimeOffset.now(),
+                  message_id: Deliver.new_message_id()]
       |> Dict.merge(Dict.take(opts, [:from, :subject, :body]))
       |> Dict.put(:to, username)
     deliver_opts = Dict.take(opts, [:exec_path])

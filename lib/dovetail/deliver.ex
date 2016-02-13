@@ -38,11 +38,17 @@ From: <%= @from %>
 To: <%= @to %>
 Subject: <%= @subject %>
 Date: <%= @date %>
+Message-ID: <%= @message_id %>
 
 <%= @body %>
 """
 
   EEx.function_from_string :def, :new_email, @email_template, [:assigns]
+
+  def new_message_id do
+    {:ok, host} = :inet.gethostname()
+    "#{:erlang.unique_integer()}@#{host}.com"
+  end
 
   # Private Functions
 
